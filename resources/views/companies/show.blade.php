@@ -2,13 +2,16 @@
 
 @section('content')
 <div class="container">
-    <h1>Company Details</h1>
+    <h1 class="m-3">Company Details</h1>
 
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">{{ $company->name }}</h5>
             <p class="card-text"><strong>Email:</strong> {{ $company->email }}</p>
-            <p class="card-text"><strong>Website:</strong> <a href="{{ $company->website }}" target="_blank">{{ $company->website }}</a></p>
+            <p class="card-text">
+                <strong>Website:</strong> 
+                <a href="{{ $company->website }}" target="_blank">{{ $company->website }}</a>
+            </p>
             <p class="card-text">
                 <strong>Logo:</strong><br>
                 @if($company->logo)
@@ -31,7 +34,9 @@
                     <th>Last Name</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    @if(Auth::check() && Auth::user()->role->name === 'admin')
                     <th>Actions</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -42,12 +47,14 @@
                         <td>{{ $employee->email }}</td>
                         <td>{{ $employee->phone }}</td>
                         <td>
-                            <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ route('employees.destroy', $employee) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                            </form>
+                            @if(Auth::check() && Auth::user()->role->name === 'admin')
+                                <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form action="{{ route('employees.destroy', $employee) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

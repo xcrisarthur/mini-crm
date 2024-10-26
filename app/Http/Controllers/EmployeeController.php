@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -16,12 +17,21 @@ class EmployeeController extends Controller
 
     public function create()
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         $companies = Company::all();
+        
         return view('employees.create', compact('companies'));
     }
 
     public function store(Request $request)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -42,12 +52,19 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
         $companies = Company::all();
         return view('employees.edit', compact('employee', 'companies'));
     }
 
     public function update(Request $request, Employee $employee)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -63,6 +80,10 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+        
         $employee->delete();
 
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully');

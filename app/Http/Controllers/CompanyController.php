@@ -5,22 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
 {
     public function index()
     {
-        $companies = Company::paginate(10);
+        $companies = Company::withCount('employees')->paginate(10);
+
         return view('companies.index', compact('companies'));
     }
 
     public function create()
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
         return view('companies.create');
     }
 
     public function store(Request $request)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         $request->validate([
             'name' => 'required|string|unique:companies',
             'email' => 'nullable|email',
@@ -48,11 +57,19 @@ class CompanyController extends Controller
 
     public function edit(Company $company)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         return view('companies.edit', compact('company'));
     }
 
     public function update(Request $request, Company $company)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         $request->validate([
             'name' => 'required|string|unique:companies,name,' . $company->id,
             'email' => 'nullable|email',
@@ -81,6 +98,10 @@ class CompanyController extends Controller
 
     public function destroy(Company $company)
     {
+        if (Auth::user()->role->name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+        
         if ($company->logo) {
             Storage::disk('public')->delete($company->logo);
         }

@@ -2,9 +2,12 @@
 
 @section('content')
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center my-3">
         <h1>Company List</h1>
-        <a href="{{ route('companies.create') }}" class="btn btn-primary">Add New Company</a>
+        
+        @if(Auth::check() && Auth::user()->role->name === 'admin')
+            <a href="{{ route('companies.create') }}" class="btn btn-primary">Add New Company</a>
+        @endif
     </div>
 
     @if(session('success'))
@@ -19,6 +22,7 @@
                 <th>Email</th>
                 <th>Logo</th>
                 <th>Website</th>
+                <th>Employees</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -36,14 +40,18 @@
                         @endif
                     </td>
                     <td>{{ $company->website }}</td>
+                    <td>{{ $company->employees_count }}</td>
                     <td>
                         <a href="{{ route('companies.show', $company) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('companies.edit', $company) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <form action="{{ route('companies.destroy', $company) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
+
+                        @if(Auth::check() && Auth::user()->role->name === 'admin')
+                            <a href="{{ route('companies.edit', $company) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <form action="{{ route('companies.destroy', $company) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
             @endforeach

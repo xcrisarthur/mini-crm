@@ -2,9 +2,12 @@
 
 @section('content')
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center my-3">
         <h1>Employee List</h1>
-        <a href="{{ route('employees.create') }}" class="btn btn-primary">Add New Employee</a>
+
+        @if(Auth::check() && Auth::user()->role->name === 'admin')
+            <a href="{{ route('employees.create') }}" class="btn btn-primary">Add New Employee</a>
+        @endif
     </div>
 
     @if(session('success'))
@@ -34,12 +37,15 @@
                     <td>{{ $employee->phone }}</td>
                     <td>
                         <a href="{{ route('employees.show', $employee) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('employees.edit', $employee) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <form action="{{ route('employees.destroy', $employee) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
+
+                        @if(Auth::check() && Auth::user()->role->name === 'admin')
+                            <a href="{{ route('employees.edit', $employee) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <form action="{{ route('employees.destroy', $employee) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
             @endforeach
